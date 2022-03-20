@@ -4,8 +4,9 @@ import ssl
 
 class WebsocketConnect:
     
-    def __init__(self,params): 
-        self.params = params
+    def __init__(self,params,update_connect): 
+        self.params         = params
+        self.update_connect = update_connect
         
     def connect(self):
 
@@ -33,6 +34,8 @@ class WebsocketConnect:
             # GO TICK
             if '['in message:
                 
+                self.update_connect -= 1
+                
                 replace_msg = message.replace("[", "")
                 replace_msg = replace_msg.replace("]", "")
                 split_msg   = replace_msg.split(",")
@@ -46,10 +49,17 @@ class WebsocketConnect:
                     print(f"MTS      : {split_msg [3]}")
                     print(f"AMOUNT   : {split_msg [4]}")
                     print(f"PRICE    : {split_msg [5]}\n")
+                
+                if self.update_connect == 0:
+                    on_close(ws) 
 
         # RUN
         ws = websocket.WebSocketApp('wss://api.bitfinex.com/ws/2', on_open = on_open, on_close = on_close, on_message = on_message,on_error=on_error)
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-        
-params = { "event": "subscribe", "channel": "trades", "symbol": "tBTCUSD"}
-WebsocketConnect(params).connect()
+
+update_connect = 10
+params         = { "event": "subscribe", "channel": "trades", "symbol": "tBTCUSD"}
+
+while True :
+    WebsocketConnect(params,update_connect).connect()
+    print("Renew Connect")
