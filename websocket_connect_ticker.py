@@ -12,8 +12,7 @@ class WebsocketConnect:
         # OPEN SOCKET
         def on_open(ws):
             print('Opened Connection')
-            params = self.params
-            ws.send(json.dumps(params))         
+            ws.send(json.dumps(self.params))         
         # CLOSE SOCKET
         def on_close(ws):
             print('Closed Connection')

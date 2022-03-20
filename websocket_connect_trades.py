@@ -12,8 +12,7 @@ class WebsocketConnect:
         # OPEN SOCKET
         def on_open(ws):
             print('Opened Connection')
-            params = self.params
-            ws.send(json.dumps(params))         
+            ws.send(json.dumps(self.params))         
         # CLOSE SOCKET
         def on_close(ws):
             print('Closed Connection')
@@ -39,6 +38,7 @@ class WebsocketConnect:
                 split_msg   = replace_msg.split(",")
 
                 if len(split_msg) == 6:
+                    # 'te' (negociação executada), 'tu' (atualização da execução da negociação)
                     print(f"--------------- TRADES ------------")
                     print(f"CH       : {split_msg [0]}")
                     print(f"TE       : {split_msg [1]}")
