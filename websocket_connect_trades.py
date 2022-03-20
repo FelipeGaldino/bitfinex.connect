@@ -1,12 +1,16 @@
 import websocket
 import json
 import ssl
+import time
+
+from save_data import save_trades_wb
 
 class WebsocketConnect:
     
-    def __init__(self,params,update_connect): 
+    def __init__(self,params,update_connect,trades_path): 
         self.params         = params
         self.update_connect = update_connect
+        self.trades_path    = trades_path
         
     def connect(self):
 
@@ -49,6 +53,8 @@ class WebsocketConnect:
                     print(f"MTS      : {split_msg [3]}")
                     print(f"AMOUNT   : {split_msg [4]}")
                     print(f"PRICE    : {split_msg [5]}\n")
+                    
+                    save_trades_wb(self.trades_path,split_msg)
                 
                 if self.update_connect == 0:
                     on_close(ws) 
@@ -60,6 +66,14 @@ class WebsocketConnect:
 update_connect = 10
 params         = { "event": "subscribe", "channel": "trades", "symbol": "tBTCUSD"}
 
+timestamp = time.time()
+
+trades_path  = f"data/websocket_trades_{timestamp}.csv"
+
+trades_csv  = open(f"{trades_path}","a")
+trades_csv.write(f"channel,te_tu,id,mts,amount,price\n")
+trades_csv.close()
+
 while True :
-    WebsocketConnect(params,update_connect).connect()
+    WebsocketConnect(params,update_connect,trades_path).connect()
     print("Renew Connect")

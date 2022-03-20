@@ -1,12 +1,16 @@
 import websocket
 import json
 import ssl
+import time
+
+from save_data import save_tickers
 
 class WebsocketConnect:
     
-    def __init__(self,params,update_connect): 
+    def __init__(self,params,update_connect,ticker_path): 
         self.params         = params
         self.update_connect = update_connect
+        self.ticker_path    = ticker_path
         
     def connect(self):
 
@@ -51,7 +55,10 @@ class WebsocketConnect:
                     print(f"DAILY_CHANGE_RELATIVE : {split_msg[6]}")
                     print(f"LAST_PRICE            : {split_msg[7]}")
                     print(f"VOLUME                : {split_msg[8]}")
-                    print(f"HIGH                  : {split_msg[9]}\n")
+                    print(f"HIGH                  : {split_msg[9]}")
+                    print(f"LOW                   : {split_msg[10]}\n")
+                    
+                    save_tickers(self.ticker_path,split_msg)
                 
                 if self.update_connect == 0:
                     on_close(ws) 
@@ -62,6 +69,14 @@ class WebsocketConnect:
 
 update_connect = 10
 params         = { "event": "subscribe", "channel": "ticker", "symbol": "tBTCUSD"}
+
+timestamp = time.time()
+
+ticker_path = f"data/websocket_ticker_{timestamp}.csv"
+ticker_csv  = open(f"{ticker_path}","a")
+ticker_csv.write(f"channel_id,bid,bid_size,ask,ask_size,daily_change,daily_change_relative,last_price,volume,high,low\n")
+ticker_csv.close()
+
 while True :
-    WebsocketConnect(params,update_connect).connect()
+    WebsocketConnect(params,update_connect,ticker_path).connect()
     print("Renew Connect")
