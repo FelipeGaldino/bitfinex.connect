@@ -60,7 +60,7 @@ class WebsocketConnect:
                     on_close(ws) 
 
         # RUN
-        ws = websocket.WebSocketApp('wss://api.bitfinex.com/ws/2', on_open = on_open, on_close = on_close, on_message = on_message,on_error=on_error)
+        ws = websocket.WebSocketApp('wss://api-pub.bitfinex.com/ws/2', on_open = on_open, on_close = on_close, on_message = on_message,on_error=on_error)
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
 update_connect = 10
